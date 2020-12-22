@@ -38,53 +38,59 @@ jobs:
       ls -al prebuilds/
     displayName: 'show prebuild versions'
 
-# - job: macOS
-#   pool:
-#     vmImage: 'macOS-10.15'
-#   strategy:
-#     matrix:
-#       node_10_x:
-#         node_version: 10.x
-#       node_12_x:
-#         node_version: 12.x
-#   steps:
-#   - task: NodeTool@0
-#     inputs:
-#       versionSpec: $(node_version)
-#     displayName: 'Install Node.js'
-#   - script: |
-#       npm i
-#     displayName: 'Install dependencies and build'
-#   - script: |
-#       npm test
-#     displayName: 'Test'
-#   - script: |
-#       npm run lint
-#     displayName: 'Lint'
+- job: macOS
+  pool:
+    vmImage: 'macOS-10.15'
+  strategy:
+    matrix:
+      node_10_x:
+        node_version: 10.x
+      node_12_x:
+        node_version: 12.x
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: $(node_version)
+    displayName: 'Install Node.js'
+  - script: |
+      npm i
+    displayName: 'Install dependencies and build'
+  - script: |
+      npm test
+    displayName: 'Test'
+  - script: |
+      npx prebuild --all
+    displayName: 'prebuild'
+  - script: |
+      ls -al prebuilds/
+    displayName: 'show prebuild versions'
 
-# - job: Windows
-#   pool:
-#     vmImage: 'vs2017-win2016'
-#   strategy:
-#     matrix:
-#       node_10_x:
-#         node_version: 10.x
-#       node_12_x:
-#         node_version: 12.x
-#   steps:
-#   - task: NodeTool@0
-#     inputs:
-#       versionSpec: $(node_version)
-#     displayName: 'Install Node.js'
-#   - script: |
-#       npm i
-#     displayName: 'Install dependencies and build'
-#   - script: |
-#       npm test
-#     displayName: 'Test'
-#   - script: |
-#       npm run lint
-#     displayName: 'Lint'
+- job: Windows
+  pool:
+    vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      node_10_x:
+        node_version: 10.x
+      node_12_x:
+        node_version: 12.x
+  steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: $(node_version)
+    displayName: 'Install Node.js'
+  - script: |
+      npm i
+    displayName: 'Install dependencies and build'
+  - script: |
+      npm test
+    displayName: 'Test'
+  - script: |
+      npx prebuild --all
+    displayName: 'prebuild'
+  - script: |
+      ls -al prebuilds/
+    displayName: 'show prebuild versions'
 
 # - job: Release
 #   dependsOn:
