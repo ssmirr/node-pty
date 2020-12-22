@@ -3,6 +3,13 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
+
+
+trigger:
+  branches:
+    include:
+      - refs/tags/*
+
 jobs:
 - job: Linux
   pool:
@@ -25,73 +32,76 @@ jobs:
       npm test
     displayName: 'Test'
   - script: |
-      npm run lint
-    displayName: 'Lint'
+      npx prebuild --all
+    displayName: 'prebuild'
+  - script: |
+      ls -al prebuilds/
+    displayName: 'show prebuild versions'
 
-- job: macOS
-  pool:
-    vmImage: 'macOS-10.15'
-  strategy:
-    matrix:
-      node_10_x:
-        node_version: 10.x
-      node_12_x:
-        node_version: 12.x
-  steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: $(node_version)
-    displayName: 'Install Node.js'
-  - script: |
-      npm i
-    displayName: 'Install dependencies and build'
-  - script: |
-      npm test
-    displayName: 'Test'
-  - script: |
-      npm run lint
-    displayName: 'Lint'
+# - job: macOS
+#   pool:
+#     vmImage: 'macOS-10.15'
+#   strategy:
+#     matrix:
+#       node_10_x:
+#         node_version: 10.x
+#       node_12_x:
+#         node_version: 12.x
+#   steps:
+#   - task: NodeTool@0
+#     inputs:
+#       versionSpec: $(node_version)
+#     displayName: 'Install Node.js'
+#   - script: |
+#       npm i
+#     displayName: 'Install dependencies and build'
+#   - script: |
+#       npm test
+#     displayName: 'Test'
+#   - script: |
+#       npm run lint
+#     displayName: 'Lint'
 
-- job: Windows
-  pool:
-    vmImage: 'vs2017-win2016'
-  strategy:
-    matrix:
-      node_10_x:
-        node_version: 10.x
-      node_12_x:
-        node_version: 12.x
-  steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: $(node_version)
-    displayName: 'Install Node.js'
-  - script: |
-      npm i
-    displayName: 'Install dependencies and build'
-  - script: |
-      npm test
-    displayName: 'Test'
-  - script: |
-      npm run lint
-    displayName: 'Lint'
+# - job: Windows
+#   pool:
+#     vmImage: 'vs2017-win2016'
+#   strategy:
+#     matrix:
+#       node_10_x:
+#         node_version: 10.x
+#       node_12_x:
+#         node_version: 12.x
+#   steps:
+#   - task: NodeTool@0
+#     inputs:
+#       versionSpec: $(node_version)
+#     displayName: 'Install Node.js'
+#   - script: |
+#       npm i
+#     displayName: 'Install dependencies and build'
+#   - script: |
+#       npm test
+#     displayName: 'Test'
+#   - script: |
+#       npm run lint
+#     displayName: 'Lint'
 
-- job: Release
-  dependsOn:
-  - Linux
-  - macOS
-  - Windows
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  pool:
-    vmImage: 'ubuntu-16.04'
-  steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '8.x'
-    displayName: 'Install Node.js'
-  - script: |
-      npm i
-    displayName: 'Install dependencies and build'
-  - script: |
-      NPM_AUTH_TOKEN="$(NPM_AUTH_TOKEN)" node ./scripts/publish.js
-    displayName: 'Publish to npm'
+# - job: Release
+#   dependsOn:
+#   - Linux
+#   - macOS
+#   - Windows
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+#   pool:
+#     vmImage: 'ubuntu-16.04'
+#   steps:
+#   - task: NodeTool@0
+#     inputs:
+#       versionSpec: '8.x'
+#     displayName: 'Install Node.js'
+#   - script: |
+#       npm i
+#     displayName: 'Install dependencies and build'
+#   - script: |
+#       NPM_AUTH_TOKEN="$(NPM_AUTH_TOKEN)" node ./scripts/publish.js
+#     displayName: 'Publish to npm'
